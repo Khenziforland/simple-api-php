@@ -1,17 +1,13 @@
 <?php
-class Post
+class ProductCategory
 {
     // Database connection
     private $conn;
-    private $table = 'posts';
+    private $table = 'product_categories';
 
-    // Post properties
+    // Product Category properties
     public $id;
-    public $category_id;
-    public $category_name;
-    public $title;
-    public $body;
-    public $author;
+    public $name;
     public $created_at;
 
     // Constructor with $db as database connection
@@ -20,24 +16,18 @@ class Post
         $this->conn = $db;
     }
 
-    // Read posts
+    // Read Product Categories
     public function read()
     {
         // Select all query
         $query = "SELECT 
-        c.name as category_name, 
-        p.id, 
-        p.category_id, 
-        p.title, 
-        p.body, 
-        p.author, 
-        p.created_at 
+            id, 
+            name, 
+            created_at 
         FROM 
-            " . $this->table . " p 
-        LEFT JOIN 
-            categories c ON p.category_id = c.id 
+            " . $this->table . " 
         ORDER BY 
-            p.created_at DESC";
+            name ASC";
 
         // Prepare statement
         $stmt = $this->conn->prepare($query);
@@ -48,24 +38,18 @@ class Post
         return $stmt;
     }
 
-    // Get Single Post
+    // Get Single Category
     public function read_single()
     {
         // Create query
         $query = 'SELECT 
-        c.name as category_name, 
-        p.id, 
-        p.category_id, 
-        p.title, 
-        p.body, 
-        p.author, 
-        p.created_at 
+        id, 
+            name, 
+            created_at 
         FROM 
-            ' . $this->table . ' p
-        LEFT JOIN
-            categories c ON p.category_id = c.id
+            ' . $this->table . '
         WHERE
-            p.id = :id
+            id = :id
         LIMIT 0,1';
 
         // Prepare statement
@@ -80,38 +64,26 @@ class Post
         $row = $stmt->fetch(PDO::FETCH_ASSOC);
 
         // Set properties
-        $this->title = $row['title'];
-        $this->body = $row['body'];
-        $this->author = $row['author'];
-        $this->category_id = $row['category_id'];
-        $this->category_name = $row['category_name'];
+        $this->name = $row['name'];
+        $this->created_at = $row['created_at'];
     }
 
-    // Create Post
+    // Create Product Category
     public function create()
     {
         // Create query
         $query = 'INSERT INTO ' . $this->table . ' 
         SET 
-            title = :title, 
-            body = :body, 
-            author = :author, 
-            category_id = :category_id';
+            name = :name';
 
         // Prepare statement
         $stmt = $this->conn->prepare($query);
 
         // Clean data
-        $this->title = htmlspecialchars(strip_tags($this->title));
-        $this->body = htmlspecialchars(strip_tags($this->body));
-        $this->author = htmlspecialchars(strip_tags($this->author));
-        $this->category_id = htmlspecialchars(strip_tags($this->category_id));
+        $this->name = htmlspecialchars(strip_tags($this->name));
 
         // Bind data
-        $stmt->bindParam(':title', $this->title);
-        $stmt->bindParam(':body', $this->body);
-        $stmt->bindParam(':author', $this->author);
-        $stmt->bindParam(':category_id', $this->category_id);
+        $stmt->bindParam(':name', $this->name);
 
         // Execute query
         if ($stmt->execute()) {
@@ -124,16 +96,13 @@ class Post
         return false;
     }
 
-    // Update Post
+    // Update Product Category
     public function update()
     {
         // Create query
         $query = 'UPDATE ' . $this->table . '
         SET 
-            title = :title,
-            body = :body,
-            author = :author,
-            category_id = :category_id
+            name = :name
         WHERE
             id = :id';
 
@@ -141,17 +110,11 @@ class Post
         $stmt = $this->conn->prepare($query);
 
         // Clean data
-        $this->title = htmlspecialchars(strip_tags($this->title));
-        $this->body = htmlspecialchars(strip_tags($this->body));
-        $this->author = htmlspecialchars(strip_tags($this->author));
-        $this->category_id = htmlspecialchars(strip_tags($this->category_id));
+        $this->name = htmlspecialchars(strip_tags($this->name));
 
         // Bind data
         $stmt->bindParam(':id', $this->id);
-        $stmt->bindParam(':title', $this->title);
-        $stmt->bindParam(':body', $this->body);
-        $stmt->bindParam(':author', $this->author);
-        $stmt->bindParam(':category_id', $this->category_id);
+        $stmt->bindParam(':name', $this->name);
 
         // Execute query
         if ($stmt->execute()) {
@@ -164,7 +127,7 @@ class Post
         return false;
     }
 
-    // Delete Post
+    // Delete Product Category
     public function delete()
     {
         // Create query

@@ -3,8 +3,8 @@ class Database {
     // Database parameters
     private $host = 'localhost';
     private $db_name = 'simple_api_php';
-    private $username = 'reyhan';
-    private $password = 'reyhan';
+    private $username = 'fikrisabriansyah';
+    private $password = 'fikrisabriansyah';
     private $conn;
 
     // Database connection
