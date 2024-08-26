@@ -21,44 +21,50 @@ $product->name = $_POST['name'] ?? '';
 $product->description = $_POST['description'] ?? '';
 $product->price = $_POST['price'] ?? '';
 
-$fileName  =  $_FILES['file']['name'];
-$tempPath  =  $_FILES['file']['tmp_name'];
-$fileSize  =  $_FILES['file']['size'];
-$fileError =  $_FILES['file']['error'];
+// Periksa apakah ada file yang diunggah
+if (isset($_FILES['file']) && $_FILES['file']['error'] !== UPLOAD_ERR_NO_FILE) {
+    $fileName  =  $_FILES['file']['name'];
+    $tempPath  =  $_FILES['file']['tmp_name'];
+    $fileSize  =  $_FILES['file']['size'];
+    $fileError =  $_FILES['file']['error'];
 
-// Handle file upload
-$fileName = str_replace(' ', '_', $fileName);
-$date = date('Ymd_His');
-$uniqueFileName = $date . '_' . uniqid() . '_' . basename($fileName);
+    // Handle file upload
+    $fileName = str_replace(' ', '_', $fileName);
+    $date = date('Ymd_His');
+    $uniqueFileName = $date . '_' . uniqid() . '_' . basename($fileName);
 
-$uploadDir = '../../assets/image/';
-$uploadFile = $uploadDir . $uniqueFileName;
+    $uploadDir = '../../assets/image/';
+    $uploadFile = $uploadDir . $uniqueFileName;
 
-// Check file type
-$fileType = strtolower(pathinfo($uploadFile, PATHINFO_EXTENSION));
-$allowedTypes = array('jpg', 'jpeg', 'png');
+    // Check file type
+    $fileType = strtolower(pathinfo($uploadFile, PATHINFO_EXTENSION));
+    $allowedTypes = array('jpg', 'jpeg', 'png');
 
-if (in_array($fileType, $allowedTypes)) {
-    if ($fileError === UPLOAD_ERR_OK) {
-        if (move_uploaded_file($tempPath, $uploadFile)) {
-            $product->file = $uploadFile;
+    if (in_array($fileType, $allowedTypes)) {
+        if ($fileError === UPLOAD_ERR_OK) {
+            if (move_uploaded_file($tempPath, $uploadFile)) {
+                $product->file = $uploadFile;
+            } else {
+                echo json_encode(
+                    array('message' => 'File Upload Failed')
+                );
+                exit();
+            }
         } else {
             echo json_encode(
-                array('message' => 'File Upload Failed')
+                array('message' => 'File Upload Error')
             );
             exit();
         }
     } else {
         echo json_encode(
-            array('message' => 'File Upload Error')
+            array('message' => 'Invalid File Type')
         );
         exit();
     }
 } else {
-    echo json_encode(
-        array('message' => 'Invalid File Type')
-    );
-    exit();
+    // Jika tidak ada file yang diunggah, gunakan default.png
+    $product->file = '../../assets/image/default.png';
 }
 
 // Create product
